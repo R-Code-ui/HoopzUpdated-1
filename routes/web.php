@@ -1,13 +1,14 @@
 <?php
 
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\Admin\DashboardController; // we'll create this
-use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\Client\ProductController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// Public routes
+// Public welcome page
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -16,6 +17,10 @@ Route::get('/', function () {
         'phpVersion' => PHP_VERSION,
     ]);
 });
+
+// Client product routes (public)
+Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
 
 // Authenticated user routes (customer area)
 Route::get('/dashboard', function () {
@@ -30,15 +35,10 @@ Route::middleware('auth')->group(function () {
 
 // Admin routes – protected by 'role:admin' middleware
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-    // Product Management Routes
-    Route::resource('products', ProductController::class);
-
-    // Additional product management routes (non-resource)
-    Route::post('/products/{product}/toggle-availability', [ProductController::class, 'toggleAvailability'])->name('products.toggle');
-    Route::put('/products/{product}/stock', [ProductController::class, 'updateStock'])->name('products.stock');
+    Route::resource('products', AdminProductController::class);
+    Route::post('/products/{product}/toggle-availability', [AdminProductController::class, 'toggleAvailability'])->name('products.toggle');
+    Route::put('/products/{product}/stock', [AdminProductController::class, 'updateStock'])->name('products.stock');
 });
 
 require __DIR__.'/auth.php';

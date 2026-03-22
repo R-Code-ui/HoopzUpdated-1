@@ -30,10 +30,10 @@ class DatabaseSeeder extends Seeder
         Brand::factory(5)->create();
 
         // Create 50 products (each with a random brand from those 5)
-        Product::factory(50)->create();
+        Product::factory(5)->create();
 
         // Create 20 orders with 1-5 items each
-        Order::factory(20)
+        Order::factory(5)
             ->has(OrderItem::factory()->count(fake()->numberBetween(1,5)), 'items')
             ->create();
 
