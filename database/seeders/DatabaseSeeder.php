@@ -3,9 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Brand;
-use App\Models\Order;
-use App\Models\OrderItem;
-use App\Models\Product;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -15,32 +12,35 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create or update a test user
+        // 1. Create or update a test user
         User::updateOrCreate(
             ['email' => 'test@example.com'],
             [
                 'name' => 'Test User',
                 'email_verified_at' => now(),
-                'password' => Hash::make('password'), // or bcrypt('password')
+                'password' => Hash::make('password'),
                 'remember_token' => Str::random(10),
             ]
         );
 
-        // Create 5 brands
-        Brand::factory(5)->create();
+        // 2. Create the three brands
+        $brands = [
+            ['name' => 'Kobe Bryant', 'slug' => 'kobe-bryant'],
+            ['name' => 'Michael Jordan', 'slug' => 'michael-jordan'],
+            ['name' => 'LeBron James', 'slug' => 'lebron-james'],
+        ];
 
-        // Create 50 products (each with a random brand from those 5)
-        Product::factory(5)->create();
+        foreach ($brands as $brand) {
+            Brand::updateOrCreate(
+                ['slug' => $brand['slug']],
+                ['name' => $brand['name']]
+            );
+        }
 
-        // Create 20 orders with 1-5 items each
-        Order::factory(5)
-            ->has(OrderItem::factory()->count(fake()->numberBetween(1,5)), 'items')
-            ->create();
-
+        // 3. Call other seeders (roles, permissions, users)
         $this->call([
             RolePermissionSeeder::class,
             UserSeeder::class,
-            // ... other seeders you may have (brands, products, etc.)
         ]);
     }
 }
