@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Client\ProductController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CheckoutController;
 use Inertia\Inertia;
 
 // Redirect root to product listing
@@ -21,6 +22,13 @@ Route::prefix('cart')->group(function () {
     Route::post('/add', [CartController::class, 'add'])->name('cart.add');
     Route::patch('/update', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/remove', [CartController::class, 'remove'])->name('cart.remove');
+});
+
+// Checkout routes (AUTH REQUIRED)
+Route::middleware('auth')->prefix('checkout')->group(function () {
+    Route::get('/', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/process', [CheckoutController::class, 'process'])->name('checkout.process');
+    Route::get('/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
 });
 
 // Profile routes (authenticated users only)

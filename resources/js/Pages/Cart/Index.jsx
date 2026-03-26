@@ -63,6 +63,24 @@ export default function Index({ cart, total }) {
                         Total: ${total}
                     </h2>
                 </div>
+
+                <div className="flex justify-between mt-6">
+                    {/* BACK BUTTON */}
+                    <button
+                        onClick={() => window.history.back()}
+                        className="bg-gray-300 px-4 py-2 rounded"
+                    >
+                        ← Back
+                    </button>
+
+                    {/* CHECKOUT BUTTON */}
+                    <button
+                        onClick={() => router.visit('/checkout')}
+                        className="bg-blue-600 text-white px-6 py-2 rounded"
+                    >
+                        Proceed to Checkout
+                    </button>
+                </div>
             </div>
 
             <Footer />

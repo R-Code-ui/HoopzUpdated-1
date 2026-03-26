@@ -3,9 +3,9 @@ import { Link, usePage } from '@inertiajs/react';
 import { HeartIcon, ShoppingCartIcon } from '@heroicons/react/24/outline';
 
 export default function Header() {
-    const page = usePage();
+    const page = usePage();// ✅ hook inside component
 
-    const { cartCount } = usePage().props;
+    const { cartCount } = page.props;
 
     // Get authentication data from Inertia (shared via HandleInertiaRequests)
     const auth = page?.props?.auth || {};

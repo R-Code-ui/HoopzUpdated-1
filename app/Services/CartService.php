@@ -67,4 +67,10 @@ class CartService
             return $item['price'] * $item['quantity'];
         });
     }
+
+    // Clear cart after checkout
+    public function clear()
+    {
+        session()->forget('cart');
+    }
 }
