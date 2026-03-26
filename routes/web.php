@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
@@ -14,6 +15,13 @@ Route::redirect('/', '/products');
 // Client product routes (public)
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
+
+Route::prefix('cart')->group(function () {
+    Route::get('/', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/add', [CartController::class, 'add'])->name('cart.add');
+    Route::patch('/update', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/remove', [CartController::class, 'remove'])->name('cart.remove');
+});
 
 // Profile routes (authenticated users only)
 Route::middleware('auth')->group(function () {

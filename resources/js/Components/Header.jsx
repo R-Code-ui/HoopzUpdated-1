@@ -3,9 +3,13 @@ import { Link, usePage } from '@inertiajs/react';
 import { HeartIcon, ShoppingCartIcon } from '@heroicons/react/24/outline';
 
 export default function Header() {
+    const page = usePage();
+
+    const { cartCount } = usePage().props;
+
     // Get authentication data from Inertia (shared via HandleInertiaRequests)
-    const { auth } = usePage().props;
-    const user = auth?.user;          // Logged-in user object or null
+    const auth = page?.props?.auth || {};
+    const user = auth?.user || null;          // Logged-in user object or null
     const permissions = auth?.permissions || []; // User permissions array
 
     // Check if user is admin (has 'manage products' permission)
@@ -25,9 +29,17 @@ export default function Header() {
                     <Link href="/wishlist" className="text-gray-600 hover:text-blue-600">
                         <HeartIcon className="h-6 w-6" />
                     </Link>
-                    <Link href="/cart" className="text-gray-600 hover:text-blue-600">
-                        <ShoppingCartIcon className="h-6 w-6" />
-                    </Link>
+                    <div className="relative">
+                        <Link href="/cart">
+                            <ShoppingCartIcon className="h-6 w-6" />
+                        </Link>
+
+                        {cartCount > 0 && (
+                            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1 rounded-full">
+                                {cartCount}
+                            </span>
+                        )}
+                    </div>
 
                     {/* Conditional authentication UI */}
                     {!user ? (

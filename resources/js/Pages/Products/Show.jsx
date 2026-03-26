@@ -3,14 +3,17 @@ import { Head, Link } from '@inertiajs/react';
 import Header from '@/Components/Header';
 import Footer from '@/Components/Footer';
 import QuantitySelector from '@/Components/QuantitySelector';
+import { router } from '@inertiajs/react';
+
 
 export default function Show({ product }) {
     const [quantity, setQuantity] = useState(1);
 
     const handleAddToCart = () => {
-        // Placeholder – will implement cart later
-        console.log(`Added ${quantity} of ${product.name} to cart`);
-        alert(`Added ${quantity} of ${product.name} to cart (demo)`);
+        router.post('/cart/add', {
+            product_id: product.id,
+            quantity: quantity,
+        });
     };
 
     // Helper to format price
