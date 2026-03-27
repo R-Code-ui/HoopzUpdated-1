@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use App\Services\CartService;
 use App\Models\Order;
 use App\Models\OrderItem;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class CheckoutController extends Controller
@@ -56,7 +57,7 @@ class CheckoutController extends Controller
 
         // Create order
         $order = Order::create([
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
             'order_number' => $orderNumber,
             'status' => 'pending', // ✅ Option B (simulation)
             'total' => $this->cartService->getTotal(),
@@ -73,7 +74,7 @@ class CheckoutController extends Controller
         }
 
         // Clear cart after order
-        session()->forget('cart');
+        $this->cartService->clear();
 
         return redirect()->route('checkout.success', $order->id);
     }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\CartItem;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -33,7 +34,31 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        // Redirect to products page instead of dashboard
+        // 🔥 MERGE SESSION CART INTO DB
+        $sessionCart = session()->get('cart', []);
+
+        foreach ($sessionCart as $item) {
+            $existing = CartItem::where('user_id', Auth::id())
+                ->where('product_id', $item['id'])
+                ->first();
+
+            if ($existing) {
+                // If already exists → add quantity
+                $existing->quantity += $item['quantity'];
+                $existing->save();
+            } else {
+                // Create new cart item
+                CartItem::create([
+                    'user_id' => Auth::id(),
+                    'product_id' => $item['id'],
+                    'quantity' => $item['quantity'],
+                ]);
+            }
+        }
+
+        // Clear session cart after merging
+        session()->forget('cart');
+
         return redirect()->intended('/products');
     }
 
