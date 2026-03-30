@@ -9,6 +9,7 @@ use App\Http\Controllers\Client\ProductController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\WishlistController;
 use Inertia\Inertia;
 
 // Redirect root to product listing
@@ -37,6 +38,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+// Wishlist routes (authenticated users only)
+Route::middleware('auth')->prefix('wishlist')->name('wishlist.')->group(function () {
+    Route::get('/', [WishlistController::class, 'index'])->name('index');
+    Route::post('/add', [WishlistController::class, 'add'])->name('add');
+    Route::delete('/remove', [WishlistController::class, 'remove'])->name('remove');
+    Route::post('/toggle', [WishlistController::class, 'toggle'])->name('toggle');
 });
 
 // Admin routes – protected by 'role:admin' middleware

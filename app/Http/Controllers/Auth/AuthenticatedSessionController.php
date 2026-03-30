@@ -34,7 +34,7 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        // 🔥 MERGE SESSION CART INTO DB
+        // 🔥 MERGE SESSION CART INTO DATABASE
         $sessionCart = session()->get('cart', []);
 
         foreach ($sessionCart as $item) {
@@ -43,15 +43,13 @@ class AuthenticatedSessionController extends Controller
                 ->first();
 
             if ($existing) {
-                // If already exists → add quantity
                 $existing->quantity += $item['quantity'];
                 $existing->save();
             } else {
-                // Create new cart item
                 CartItem::create([
-                    'user_id' => Auth::id(),
+                    'user_id'    => Auth::id(),
                     'product_id' => $item['id'],
-                    'quantity' => $item['quantity'],
+                    'quantity'   => $item['quantity'],
                 ]);
             }
         }
@@ -59,6 +57,14 @@ class AuthenticatedSessionController extends Controller
         // Clear session cart after merging
         session()->forget('cart');
 
+        // ✅ REDIRECT BASED ON USER ROLE / PERMISSION
+        // Check if the user is admin (has 'manage products' permission)
+        if (Auth::user()->can('manage products')) {
+            // Admin: go to admin dashboard
+            return redirect()->route('admin.dashboard');
+        }
+
+        // Regular user: go to products page (or intended URL)
         return redirect()->intended('/products');
     }
 
