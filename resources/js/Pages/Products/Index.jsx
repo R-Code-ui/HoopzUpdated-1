@@ -90,24 +90,27 @@
                         </div>
                     )}
 
-                    {/* Pagination */}
-                    <div className="mt-8">
-                        {products.links && (
-                            <div className="flex justify-center">
-                                {products.links.map((link, index) => (
-                                    <Link
-                                        key={index}
-                                        href={link.url || '#'}
-                                        className={`mx-1 px-3 py-1 rounded ${
-                                            link.active
-                                                ? 'bg-blue-600 text-white'
-                                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                                        } ${!link.url ? 'cursor-not-allowed opacity-50' : ''}`}
-                                        dangerouslySetInnerHTML={{ __html: link.label }}
-                                    />
-                                ))}
-                            </div>
-                        )}
+                    {/* 🔥 PAGINATION (BLACK & WHITE - CENTERED LIKE ADMIN) */}
+                    <div className="mt-10 flex flex-wrap justify-center gap-2">
+                        {products.links.map((link, index) => (
+                            <Link
+                                key={index}
+                                href={link.url || "#"} // if no URL → disable
+                                className={`
+                                    px-4 py-2 border-2 border-black font-bold uppercase text-xs tracking-widest transition-all duration-200
+
+                                    /* ACTIVE PAGE (current page) */
+                                    ${link.active
+                                        ? 'bg-black text-white'
+                                        : 'bg-white text-black hover:bg-black hover:text-white'
+                                    }
+
+                                    /* DISABLED BUTTON (no link) */
+                                    ${!link.url ? 'opacity-30 cursor-not-allowed' : ''}
+                                `}
+                                dangerouslySetInnerHTML={{ __html: link.label }} // Laravel pagination labels
+                            />
+                        ))}
                     </div>
                 </main>
 

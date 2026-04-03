@@ -15,16 +15,43 @@ class ProductController extends Controller
     /**
      * Display a listing of products (paginated)
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Get all products with their brand relationship, paginated (10 per page)
-        $products = Product::with('brand')
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        // Get query inputs
+        $search = $request->search;
+        $sort = $request->sort;
 
-        // Return Inertia view with products data
+        // Base query with relationship
+        $query = Product::with('brand');
+
+        // 🔍 SEARCH (name or brand name)
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                ->orWhereHas('brand', function ($q2) use ($search) {
+                    $q2->where('name', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        // 🔽 SORTING (price)
+        if ($sort === 'low-high') {
+            $query->orderBy('price', 'asc');
+        } elseif ($sort === 'high-low') {
+            $query->orderBy('price', 'desc');
+        } else {
+            $query->latest(); // default
+        }
+
+        // Pagination (IMPORTANT: keep query string)
+        $products = $query->paginate(10)->withQueryString();
+
         return Inertia::render('Admin/Products/Index', [
-            'products' => $products
+            'products' => $products,
+            'filters' => [
+                'search' => $search,
+                'sort' => $sort ?? 'default',
+            ]
         ]);
     }
 

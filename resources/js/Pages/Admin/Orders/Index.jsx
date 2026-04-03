@@ -1,12 +1,14 @@
 import React from 'react';
 import { Link, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import SearchBar from '@/Components/SearchBar'; // 🔥 IMPORT
 
 export default function Index({ orders, filters }) {
 
     const handleFilter = (e) => {
         router.get(route('admin.orders.index'), {
             status: e.target.value,
+            search: filters.search, // 🔥 KEEP SEARCH
         }, { preserveState: true });
     };
 
@@ -18,6 +20,13 @@ export default function Index({ orders, filters }) {
                     <div className="bg-white shadow-sm sm:rounded-lg p-6">
 
                         <h1 className="text-2xl font-bold mb-6">Orders</h1>
+
+                        {/* 🔥 SEARCH BAR COMPONENT */}
+                        <SearchBar
+                            initialSearch={filters.search}
+                            routeName={route('admin.orders.index')} // 🔥 IMPORTANT
+                            extraParams={{ status: filters.status }} // 🔥 KEEP FILTER
+                        />
 
                         {/* FILTER */}
                         <select
@@ -63,6 +72,25 @@ export default function Index({ orders, filters }) {
                                 ))}
                             </tbody>
                         </table>
+
+                        {/* PAGINATION */}
+                        <div className="mt-10 flex flex-wrap justify-center gap-2">
+                            {orders.links.map((link, index) => (
+                                <Link
+                                    key={index}
+                                    href={link.url || "#"}
+                                    className={`
+                                        px-4 py-2 border-2 border-black font-bold uppercase text-xs tracking-widest transition-all duration-200
+                                        ${link.active
+                                            ? 'bg-black text-white'
+                                            : 'bg-white text-black hover:bg-black hover:text-white'
+                                        }
+                                        ${!link.url ? 'opacity-30 cursor-not-allowed' : ''}
+                                    `}
+                                    dangerouslySetInnerHTML={{ __html: link.label }}
+                                />
+                            ))}
+                        </div>
 
                     </div>
                 </div>

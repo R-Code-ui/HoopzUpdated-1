@@ -12,12 +12,26 @@ class OrderController extends Controller
     // SHOW ALL ORDERS (with optional filters)
     public function index(Request $request)
     {
-        // Get filter inputs
+        // Get filters
         $status = $request->status;
         $date = $request->date;
+        $search = $request->search; // 🔥 NEW (search input)
 
-        // Base query with relationships (VERY IMPORTANT)
+        // Base query with relationships
         $query = Order::with(['user']);
+
+        // 🔥 SEARCH LOGIC (VERY IMPORTANT)
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                // Search by order number
+                $q->where('order_number', 'like', "%{$search}%")
+
+                // OR search by customer name
+                ->orWhereHas('user', function ($userQuery) use ($search) {
+                    $userQuery->where('name', 'like', "%{$search}%");
+                });
+            });
+        }
 
         // Filter by status
         if ($status && $status !== 'all') {
@@ -29,7 +43,7 @@ class OrderController extends Controller
             $query->whereDate('created_at', $date);
         }
 
-        // Paginate results
+        // Pagination
         $orders = $query->latest()->paginate(10)->withQueryString();
 
         return Inertia::render('Admin/Orders/Index', [
@@ -37,6 +51,7 @@ class OrderController extends Controller
             'filters' => [
                 'status' => $status ?? 'all',
                 'date' => $date,
+                'search' => $search ?? '', // 🔥 pass to frontend
             ]
         ]);
     }
