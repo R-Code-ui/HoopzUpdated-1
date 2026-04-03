@@ -21,8 +21,10 @@ export default function Index({ cart, total }) {
             <div className="max-w-6xl mx-auto p-6">
                 <h1 className="text-2xl font-bold mb-6">Shopping Cart</h1>
 
+                {/* EMPTY CART MESSAGE */}
                 {items.length === 0 && <p>Your cart is empty.</p>}
 
+                {/* CART ITEMS */}
                 {items.map(item => (
                     <div key={item.id} className="flex items-center justify-between border-b py-4">
                         <div className="flex items-center gap-4">
@@ -37,6 +39,7 @@ export default function Index({ cart, total }) {
                         </div>
 
                         <div className="flex items-center gap-3">
+                            {/* UPDATE QUANTITY */}
                             <input
                                 type="number"
                                 value={item.quantity}
@@ -47,6 +50,7 @@ export default function Index({ cart, total }) {
                                 className="w-16 border text-center"
                             />
 
+                            {/* REMOVE ITEM */}
                             <button
                                 onClick={() => removeItem(item.id)}
                                 className="text-red-500"
@@ -64,19 +68,22 @@ export default function Index({ cart, total }) {
                     </h2>
                 </div>
 
+                {/* ACTION BUTTONS */}
                 <div className="flex justify-between mt-6">
-                    {/* BACK BUTTON */}
+
+                    {/* ✅ FIXED BACK BUTTON */}
                     <button
-                        onClick={() => window.history.back()}
-                        className="bg-gray-300 px-4 py-2 rounded"
+                        onClick={() => router.visit('/products')}
+                        // 🔥 ALWAYS goes to products page
+                        className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400"
                     >
-                        ← Back
+                        ← Back to Products
                     </button>
 
                     {/* CHECKOUT BUTTON */}
                     <button
                         onClick={() => router.visit('/checkout')}
-                        className="bg-blue-600 text-white px-6 py-2 rounded"
+                        className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
                     >
                         Proceed to Checkout
                     </button>

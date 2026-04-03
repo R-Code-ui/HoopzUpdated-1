@@ -2,21 +2,33 @@ import React from 'react';
 import { useForm } from '@inertiajs/react';
 
 export default function ProductForm({ product = null, brands, submitUrl, method = 'post' }) {
-    const { data, setData, post, put, processing, errors } = useForm({
+
+    // ✅ Initialize form data
+    const { data, setData, post, processing, errors } = useForm({
         brand_id: product?.brand_id || '',
         name: product?.name || '',
         description: product?.description || '',
         price: product?.price || '',
         stock: product?.stock || '',
         is_active: product?.is_active ?? true,
+
+        // NEW IMAGE (file input)
         image: null,
+
+        // ✅ IMPORTANT: store existing image path
+        existing_image: product?.image || null,
+
+        // Needed for PUT request in Laravel
         _method: method === 'put' ? 'put' : undefined
     });
 
+    // ✅ Handle submit
     const handleSubmit = (e) => {
         e.preventDefault();
 
         const formData = new FormData();
+
+        // Append all fields
         formData.append('brand_id', data.brand_id);
         formData.append('name', data.name);
         formData.append('description', data.description);
@@ -24,10 +36,16 @@ export default function ProductForm({ product = null, brands, submitUrl, method 
         formData.append('stock', data.stock);
         formData.append('is_active', data.is_active);
 
+        // ✅ If user uploads NEW image
         if (data.image) {
             formData.append('image', data.image);
         }
+        // ✅ If NO new image → keep old image
+        else if (data.existing_image) {
+            formData.append('existing_image', data.existing_image);
+        }
 
+        // ✅ Handle PUT (update)
         if (method === 'put') {
             formData.append('_method', 'PUT');
             post(submitUrl, formData);
@@ -38,7 +56,8 @@ export default function ProductForm({ product = null, brands, submitUrl, method 
 
     return (
         <form onSubmit={handleSubmit} encType="multipart/form-data">
-            {/* Brand Selection */}
+
+            {/* BRAND */}
             <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2">Brand *</label>
                 <select
@@ -49,13 +68,15 @@ export default function ProductForm({ product = null, brands, submitUrl, method 
                 >
                     <option value="">Select Brand</option>
                     {brands.map((brand) => (
-                        <option key={brand.id} value={brand.id}>{brand.name}</option>
+                        <option key={brand.id} value={brand.id}>
+                            {brand.name}
+                        </option>
                     ))}
                 </select>
                 {errors.brand_id && <p className="text-red-500 text-xs mt-1">{errors.brand_id}</p>}
             </div>
 
-            {/* Product Name */}
+            {/* NAME */}
             <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2">Product Name *</label>
                 <input
@@ -68,7 +89,7 @@ export default function ProductForm({ product = null, brands, submitUrl, method 
                 {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
             </div>
 
-            {/* Description */}
+            {/* DESCRIPTION */}
             <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2">Description</label>
                 <textarea
@@ -80,7 +101,7 @@ export default function ProductForm({ product = null, brands, submitUrl, method 
                 {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
             </div>
 
-            {/* Price and Stock */}
+            {/* PRICE + STOCK */}
             <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
                     <label className="block text-gray-700 text-sm font-bold mb-2">Price ($) *</label>
@@ -94,8 +115,9 @@ export default function ProductForm({ product = null, brands, submitUrl, method 
                     />
                     {errors.price && <p className="text-red-500 text-xs mt-1">{errors.price}</p>}
                 </div>
+
                 <div>
-                    <label className="block text-gray-700 text-sm font-bold mb-2">Stock Quantity *</label>
+                    <label className="block text-gray-700 text-sm font-bold mb-2">Stock *</label>
                     <input
                         type="number"
                         value={data.stock}
@@ -107,26 +129,38 @@ export default function ProductForm({ product = null, brands, submitUrl, method 
                 </div>
             </div>
 
-            {/* Image Upload */}
+            {/* IMAGE */}
             <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2">Product Image</label>
+
+                {/* ✅ SHOW CURRENT IMAGE */}
                 {product?.image && (
                     <div className="mb-2">
-                        <img src={`/storage/${product.image}`} alt={product.name} className="h-32 w-32 object-cover rounded" />
+                        <img
+                            src={`/storage/${product.image}`}
+                            alt={product.name}
+                            className="h-32 w-32 object-cover rounded"
+                        />
                         <p className="text-xs text-gray-500 mt-1">Current image</p>
                     </div>
                 )}
+
                 <input
                     type="file"
                     accept="image/*"
                     onChange={(e) => setData('image', e.target.files[0])}
                     className="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
+
+                {/* ✅ UX IMPROVEMENT */}
+                <p className="text-xs text-gray-500 mt-1">
+                    Leave blank to keep current image
+                </p>
+
                 {errors.image && <p className="text-red-500 text-xs mt-1">{errors.image}</p>}
-                <p className="text-xs text-gray-500 mt-1">Allowed: JPEG, PNG, JPG, GIF (max 2MB)</p>
             </div>
 
-            {/* Status Toggle */}
+            {/* STATUS */}
             <div className="mb-6">
                 <label className="flex items-center">
                     <input
@@ -135,11 +169,13 @@ export default function ProductForm({ product = null, brands, submitUrl, method 
                         onChange={(e) => setData('is_active', e.target.checked)}
                         className="mr-2"
                     />
-                    <span className="text-gray-700 text-sm font-bold">Product Active (available for sale)</span>
+                    <span className="text-gray-700 text-sm font-bold">
+                        Product Active
+                    </span>
                 </label>
             </div>
 
-            {/* Submit Button */}
+            {/* BUTTONS */}
             <div className="flex justify-end space-x-2">
                 <button
                     type="button"
@@ -148,12 +184,15 @@ export default function ProductForm({ product = null, brands, submitUrl, method 
                 >
                     Cancel
                 </button>
+
                 <button
                     type="submit"
                     disabled={processing}
                     className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
                 >
-                    {processing ? 'Saving...' : (product ? 'Update Product' : 'Create Product')}
+                    {processing
+                        ? 'Saving...'
+                        : (product ? 'Update Product' : 'Create Product')}
                 </button>
             </div>
         </form>

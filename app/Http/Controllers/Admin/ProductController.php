@@ -54,7 +54,7 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'is_active' => 'boolean',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048' // 2MB max
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048' // ✅ added webp
         ]);
 
         // Generate slug from name
@@ -94,7 +94,7 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        // Validate the request data
+        // Validate request
         $validated = $request->validate([
             'brand_id' => 'required|exists:brands,id',
             'name' => 'required|string|max:255|unique:products,name,' . $product->id,
@@ -102,28 +102,29 @@ class ProductController extends Controller
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'is_active' => 'boolean',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048' // ✅ added webp
         ]);
 
-        // Update slug if name changed
-        $validated['slug'] = Str::slug($validated['name']);
+        // Update slug
+        $validated['slug'] = \Illuminate\Support\Str::slug($validated['name']);
 
-        // Handle image upload
         if ($request->hasFile('image')) {
-            // Delete old image if exists
+            // Delete old image
             if ($product->image) {
-                Storage::disk('public')->delete($product->image);
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($product->image);
             }
 
             // Store new image
             $path = $request->file('image')->store('products', 'public');
             $validated['image'] = $path;
+        } else {
+            // Keep old image
+            $validated['image'] = $product->image;
         }
 
-        // Update the product
+        // Update product
         $product->update($validated);
 
-        // Redirect back with success message
         return redirect()->route('admin.products.index')
             ->with('success', 'Product updated successfully!');
     }

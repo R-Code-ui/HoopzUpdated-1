@@ -82,6 +82,10 @@ class CheckoutController extends Controller
     // Success page
     public function success(Order $order)
     {
+        // ✅ Load relationships so we can access:
+        // product → brand → name
+        $order->load('items.product.brand');
+
         return Inertia::render('Checkout/Success', [
             'order' => $order
         ]);
