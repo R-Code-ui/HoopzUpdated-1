@@ -1,3 +1,26 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+    /* Admin Sidebar Nav Items */
+    .nav-item-admin {
+        @apply flex items-center px-3 py-2 text-sm font-bold uppercase tracking-widest transition-colors duration-200 text-gray-400 hover:text-white hover:bg-white/5;
+    }
+
+    .nav-item-admin-active {
+        @apply text-white bg-white/10 border-l-4 border-white;
+    }
+
+    .btn-admin-primary {
+        @apply inline-flex items-center justify-center bg-black text-white border-2 border-black px-4 py-2 text-xs font-black uppercase tracking-widest transition-all
+               hover:bg-white hover:text-black
+               focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+
+    .btn-admin-danger {
+        @apply inline-flex items-center justify-center bg-white text-red-600 border-2 border-red-600 px-4 py-2 text-xs font-black uppercase tracking-widest transition-all
+               hover:bg-red-600 hover:text-white
+               focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+}

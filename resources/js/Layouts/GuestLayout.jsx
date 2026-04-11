@@ -1,16 +1,16 @@
-import ApplicationLogo from '@/Components/ApplicationLogo';
 import { Link } from '@inertiajs/react';
 
 export default function GuestLayout({ children }) {
     return (
-        <div className="flex min-h-screen flex-col items-center bg-gray-100 pt-6 sm:justify-center sm:pt-0">
+        /* White background and tracking-tight to match the store aesthetic */
+        <div className="flex min-h-screen flex-col items-center bg-white pt-6 sm:justify-center sm:pt-0 font-sans tracking-tight">
             <div>
-                <Link href="/">
-                    <ApplicationLogo className="h-20 w-20 fill-current text-gray-500" />
+                <Link href="/" className="text-4xl font-black uppercase italic tracking-tighter">
+                    Hoopz
                 </Link>
             </div>
 
-            <div className="mt-6 w-full overflow-hidden bg-white px-6 py-4 shadow-md sm:max-w-md sm:rounded-lg">
+            <div className="mt-8 w-full bg-white px-8 py-10 border-2 border-black sm:max-w-md">
                 {children}
             </div>
         </div>

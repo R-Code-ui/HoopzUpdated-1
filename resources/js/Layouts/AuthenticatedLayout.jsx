@@ -1,7 +1,4 @@
-import ApplicationLogo from '@/Components/ApplicationLogo';
-import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -10,133 +7,128 @@ export default function AuthenticatedLayout({ header, children }) {
     const user = auth.user;
     const permissions = auth.permissions || [];
 
-    // Admin check
     const canManageProducts = permissions.includes('manage products');
-
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
 
     return (
-        <div className="min-h-screen bg-gray-100">
-            <nav className="border-b border-gray-100 bg-white">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div className="flex h-16 justify-between">
+        <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row font-sans tracking-tight">
 
-                        {/* LEFT SIDE */}
-                        <div className="flex">
-                            <div className="flex shrink-0 items-center">
-                                <Link href="/">
-                                    <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
-                                </Link>
-                            </div>
+            {/* --- SIDEBAR / MOBILE HEADER --- */}
+            <nav className="w-full md:w-64 bg-black text-white md:min-h-screen flex-shrink-0 z-50 relative">
+                <div className="flex flex-col h-full">
 
-                            {/* DESKTOP NAV */}
-                            <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    {/* TOP BAR: Logo & Mobile Toggle */}
+                    <div className="flex h-20 items-center justify-between px-6 border-b border-white/10 md:border-none">
+                        <Link href="/" className="flex items-center">
+                            <img
+                                src="/images/HoopzLogo-1.png"
+                                alt="Hoopz Logo"
+                                className="h-7 w-auto invert brightness-0"
+                            />
+                        </Link>
 
-                                {canManageProducts && (
-                                    <NavLink href={route('admin.dashboard')} active={route().current('admin.dashboard')}>
-                                        Dashboard
-                                    </NavLink>
-                                )}
+                        {/* Mobile Menu Toggle Button */}
+                        <button
+                            onClick={() => setShowingNavigationDropdown(!showingNavigationDropdown)}
+                            className="md:hidden p-2 text-white outline-none focus:ring-0"
+                        >
+                            <span className="text-2xl leading-none">
+                                {showingNavigationDropdown ? '✕' : '☰'}
+                            </span>
+                        </button>
+                    </div>
 
-                                {canManageProducts && (
-                                    <NavLink href={route('admin.products.index')} active={route().current('admin.products.*')}>
-                                        Products
-                                    </NavLink>
-                                )}
+                    {/* NAVIGATION LINKS: Vertical Stack */}
+                    <div className={`${showingNavigationDropdown ? 'block' : 'hidden'} md:block flex-1 px-8 py-6`}>
 
-                                {/* 🔥 NEW: Orders */}
-                                {canManageProducts && (
-                                    <NavLink href={route('admin.orders.index')} active={route().current('admin.orders.*')}>
-                                        Orders
-                                    </NavLink>
-                                )}
+                        {/* MANAGEMENT SECTION */}
+                        <div className="flex flex-col space-y-6">
+                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 mb-2">
+                                Management
+                            </p>
 
-                            </div>
+                            {canManageProducts && (
+                                <NavLink
+                                    href={route('admin.dashboard')}
+                                    active={route().current('admin.dashboard')}
+                                >
+                                    Dashboard
+                                </NavLink>
+                            )}
+
+                            {canManageProducts && (
+                                <NavLink
+                                    href={route('admin.products.index')}
+                                    active={route().current('admin.products.*')}
+                                >
+                                    Products
+                                </NavLink>
+                            )}
+
+                            {canManageProducts && (
+                                <NavLink
+                                    href={route('admin.orders.index')}
+                                    active={route().current('admin.orders.*')}
+                                >
+                                    Orders
+                                </NavLink>
+                            )}
                         </div>
 
-                        {/* RIGHT SIDE */}
-                        <div className="hidden sm:flex sm:items-center sm:ms-6">
-                            <Dropdown>
-                                <Dropdown.Trigger>
-                                    <span className="inline-flex rounded-md">
-                                        <button className="inline-flex items-center px-3 py-2 text-sm text-gray-500 hover:text-gray-700">
-                                            {user.name}
-                                        </button>
-                                    </span>
-                                </Dropdown.Trigger>
+                        {/* ACCOUNT SECTION */}
+                        <div className="mt-12 pt-12 border-t border-white/10 flex flex-col space-y-6">
+                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500 mb-2">
+                                Account
+                            </p>
 
-                                <Dropdown.Content>
-                                    <Dropdown.Link href={route('profile.edit')}>
-                                        Profile
-                                    </Dropdown.Link>
-                                    <Dropdown.Link href={route('logout')} method="post" as="button">
-                                        Log Out
-                                    </Dropdown.Link>
-                                </Dropdown.Content>
-                            </Dropdown>
-                        </div>
-
-                        {/* MOBILE BUTTON */}
-                        <div className="-me-2 flex items-center sm:hidden">
-                            <button
-                                onClick={() => setShowingNavigationDropdown(!showingNavigationDropdown)}
-                                className="p-2 text-gray-400 hover:text-gray-500"
+                            <Link
+                                href={route('profile.edit')}
+                                className="text-sm font-black uppercase tracking-widest text-white hover:text-gray-300 transition duration-150"
                             >
-                                ☰
-                            </button>
+                                Profile Settings
+                            </Link>
+
+                            <Link
+                                href={route('logout')}
+                                method="post"
+                                as="button"
+                                className="text-sm font-black uppercase tracking-widest text-red-500 hover:text-red-400 transition duration-150 text-left"
+                            >
+                                Sign Out
+                            </Link>
                         </div>
                     </div>
-                </div>
 
-                {/* MOBILE NAV */}
-                <div className={(showingNavigationDropdown ? 'block' : 'hidden') + ' sm:hidden'}>
-                    <div className="space-y-1 pb-3 pt-2">
-
-                        {canManageProducts && (
-                            <ResponsiveNavLink href={route('admin.dashboard')}>
-                                Dashboard
-                            </ResponsiveNavLink>
-                        )}
-
-                        {canManageProducts && (
-                            <ResponsiveNavLink href={route('admin.products.index')}>
-                                Products
-                            </ResponsiveNavLink>
-                        )}
-
-                        {/* 🔥 NEW: Orders */}
-                        {canManageProducts && (
-                            <ResponsiveNavLink href={route('admin.orders.index')}>
-                                Orders
-                            </ResponsiveNavLink>
-                        )}
-
-                    </div>
-
-                    <div className="border-t pt-4 px-4">
-                        <div>{user.name}</div>
-                        <div className="text-sm text-gray-500">{user.email}</div>
-
-                        <ResponsiveNavLink href={route('profile.edit')}>
-                            Profile
-                        </ResponsiveNavLink>
-
-                        <ResponsiveNavLink method="post" href={route('logout')} as="button">
-                            Logout
-                        </ResponsiveNavLink>
+                    {/* DESKTOP USER FOOTER */}
+                    <div className="hidden md:block p-8 border-t border-white/10 bg-black/20">
+                        <div className="text-[10px] font-black uppercase tracking-widest text-white truncate">
+                            {user.name}
+                        </div>
+                        <div className="text-[9px] text-gray-500 truncate uppercase tracking-tighter mt-1">
+                            {user.email}
+                        </div>
                     </div>
                 </div>
             </nav>
 
-            {header && (
-                <header className="bg-white shadow">
-                    <div className="max-w-7xl mx-auto px-4 py-6">
-                        {header}
-                    </div>
-                </header>
-            )}
+            {/* --- MAIN CONTENT AREA --- */}
+            <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+                {header && (
+                    <header className="bg-white border-b border-gray-200">
+                        <div className="px-6 py-10 md:px-12">
+                            <h2 className="text-3xl font-black uppercase italic tracking-tighter text-black">
+                                {header}
+                            </h2>
+                        </div>
+                    </header>
+                )}
 
-            <main>{children}</main>
+                <main className="flex-1 overflow-y-auto p-6 md:p-12">
+                    <div className="max-w-[1400px] mx-auto">
+                        {children}
+                    </div>
+                </main>
+            </div>
         </div>
     );
 }

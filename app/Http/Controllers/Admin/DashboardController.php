@@ -27,8 +27,10 @@ class DashboardController extends Controller
 
         // TOTAL CUSTOMERS (only users with customer role)
         $totalCustomers = User::role('customer')->count();
-        // If you want all users instead:
-        // $totalCustomers = User::count();
+
+        // TOTAL PRODUCTS (count all active products)
+        $totalProducts = Product::where('is_active', true)->count();
+        // If you want to count all products (including inactive), use: Product::count();
 
         // LOW STOCK PRODUCTS (less than 5)
         $lowStockProducts = Product::where('stock', '<', 5)
@@ -37,10 +39,11 @@ class DashboardController extends Controller
 
         // Send data to React (Inertia)
         return Inertia::render('Admin/Dashboard', [
-            'totalSales' => $totalSales,
-            'totalOrders' => $totalOrders,
-            'totalCustomers' => $totalCustomers,
-            'lowStockProducts' => $lowStockProducts,
+            'totalSales'        => $totalSales,
+            'totalOrders'       => $totalOrders,
+            'totalCustomers'    => $totalCustomers,
+            'totalProducts'     => $totalProducts,      // ✅ Added
+            'lowStockProducts'  => $lowStockProducts,
         ]);
     }
 }
